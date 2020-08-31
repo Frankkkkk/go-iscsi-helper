@@ -33,7 +33,14 @@ type KernelDevice struct {
 
 func getIPFromAddrs(addrs []net.Addr) string {
 	for _, addr := range addrs {
+		logrus.Warnf("Will get ip from %s", addr)
+
+		if ip, ok := addr.(*net.IPNet); ok {
+			logrus.Warnf("I have %s", ip.IP.String())
+		}
+
 		if ip, ok := addr.(*net.IPNet); ok && ip.IP.IsGlobalUnicast() {
+			logrus.Warnf("Will get ip from %s", addr)
 			return strings.Split(ip.IP.String(), "/")[0]
 		}
 	}
@@ -48,6 +55,7 @@ func GetIPToHost() (string, error) {
 	// TODO: This is a workaround, we want to get the interface IP connect
 	// to the host, it's likely eth1 with one network attached to the host.
 	for _, iface := range ifaces {
+		logrus.Warnf("Wil process iface %s", iface)
 		if iface.Name == "eth1" {
 			addrs, err := iface.Addrs()
 			if err != nil {
